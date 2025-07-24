@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Resume | Ricky G. Jamero</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Slate Gray and Cool Blue -->
+    <!-- Application Structure Plan: A multi-section, single-page application designed for non-linear exploration. The structure includes: 1) A header with a summary for immediate impact. 2) An interactive career timeline where users click a job to see details, making history explorable. 3) A filterable skills explorer to categorize and showcase technical breadth. 4) A dedicated "Featured Projects" section to highlight key achievements. This structure was chosen to transform the static resume into an engaging portfolio, allowing recruiters to quickly grasp key strengths and delve into areas of interest without linear scrolling, enhancing usability and information retention. -->
+    <!-- Visualization & Content Choices: 1) Career History -> Goal: Organize/Change -> Viz: Interactive vertical timeline (HTML/CSS/JS) -> Interaction: Click job title to show/hide details in a dedicated pane. Justification: More engaging and organized than a long text list. 2) Technical Skills -> Goal: Organize/Compare -> Viz: Filterable buttons and dynamic text area (HTML/JS) -> Interaction: Click category to display specific skills. Justification: Breaks down a large data matrix into digestible, user-controlled chunks. 3) Key Achievements -> Goal: Inform/Engage -> Viz: Content Cards (HTML/CSS). Justification: Elevates high-impact projects from the main text body for better visibility. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+            left: -0.625rem;
+            top: 0;
+            background-color: #3b82f6;
+            border: 4px solid #dbeafe;
+        }
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background-color: #9ca3af;
+            left: 0;
+            top: 1.25rem;
+        }
+        .active-tab {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-700">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-800">Ricky G. Jamero</h1>
+            <p class="text-xl md:text-2xl text-blue-600 mt-2">Senior Unix/Linux System Administrator</p>
+            <div class="flex justify-center space-x-6 mt-4 text-sm">
+                <a href="mailto:rikijam05@gmail.com" class="hover:text-blue-600 transition-colors">rikijam05@gmail.com</a>
+                <a href="https://www.linkedin.com/in/ricky-gam05-jamero/" target="_blank" class="hover:text-blue-600 transition-colors">LinkedIn Profile</a>
+                <span>+639227311797</span>
+            </div>
+        </header>
+
+        <section id="summary" class="mb-16 bg-white p-8 rounded-xl shadow-sm">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4 text-center">Professional Summary</h2>
+            <p class="text-center max-w-4xl mx-auto">
+                Senior Unix/Linux System Administrator with over 15 years of enterprise IT experience across diverse global organizations, including Optum, DXC Technologies, FireEye, UBS AG, NYSE Technologies, and Hewlett Packard. Proven expertise in managing critical infrastructure within banking, financial markets, telecommunications, cybersecurity, healthcare, and BPO sectors. Certified in Microsoft Azure Fundamentals (AZ-900) and Linux Professional Institute LPIC-101, complemented by advanced training in AWS Systems Operations and Red Hat Linux Administration (RH254, RH033, RH133). Demonstrates deep technical proficiency in Unix/Linux operating systems (Red Hat Enterprise Linux, Solaris, AIX, HP-UX), enterprise application management, core network services, VMware virtualization, storage architecture, and server hardware provisioning. Adept at automation using Bash, Python, Puppet, Chef, and Ansible, and developing self-service solutions.
+            </p>
+        </section>
+        
+        <section id="Work-experience" class="mb-16">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-800">Work experience</h2>
+                <p class="mt-2 text-slate-600 max-w-3xl mx-auto">An interactive timeline of my professional experience. Click on any role to see the detailed responsibilities and key achievements from that period. This allows you to explore my career progression and see how my skills have evolved over time.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div id="timeline-nav" class="md:col-span-1">
+                    <div class="relative pl-8">
+                    </div>
+                </div>
+                <div id="experience-details" class="md:col-span-2 bg-white p-6 rounded-xl shadow-sm min-h-[300px]">
+                </div>
+            </div>
+        </section>
+
+        <section id="skills-explorer" class="mb-16">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-800">Technical Skills Explorer</h2>
+                <p class="mt-2 text-slate-600 max-w-3xl mx-auto">My technical expertise is broad and deep. Use the filters below to explore the specific technologies I've mastered across different domains, from operating systems and cloud platforms to automation and middleware.</p>
+            </div>
+            <div id="skill-categories" class="flex flex-wrap justify-center gap-2 mb-6">
+            </div>
+            <div id="skill-display" class="bg-white p-6 rounded-xl shadow-sm min-h-[100px] text-center">
+                <p class="text-slate-500">Select a category to view skills.</p>
+            </div>
+        </section>
+
+        <section id="featured-projects" class="mb-16">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-800">Featured Projects & Achievements</h2>
+                <p class="mt-2 text-slate-600 max-w-3xl mx-auto">Beyond day-to-day administration, I focus on creating value through automation and development. Here are some key projects I've engineered to improve monitoring, streamline operations, and empower users with self-service capabilities.</p>
+            </div>
+            <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+        </section>
+        
+        <section id="education-certs" class="bg-white p-8 rounded-xl shadow-sm">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">Education & Certifications</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
+                <div>
+                    <h3 class="text-lg font-semibold text-blue-600">Education</h3>
+                    <p class="mt-2 font-bold">Bachelor of Science in Information Technology</p>
+                    <p>Polytechnic University of the Philippines | 2005-2009</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-blue-600">Key Certifications</h3>
+                    <ul id="certifications-list" class="mt-2 space-y-1">
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 text-center">
+                <h3 class="text-lg font-semibold text-blue-600">Training</h3>
+                <ul id="training-list" class="mt-2 space-y-1">
+                </ul>
+            </div>
+        </section>
+
+        <footer class="text-center mt-16 py-6 border-t border-slate-200">
+            <p class="text-sm text-slate-500">&copy; 2025 Ricky G. Jamero | Interactive Resume</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const resumeData = {
+            experience: [
+                {
+                    role: "Senior Unix/Linux System Administrator",
+                    company: "Optum Global Solutions",
+                    period: "April 2018 – Present",
+                    details: [
+                        "Led troubleshooting and resolution of escalated high-priority incidents, performing deep root cause analysis and collaborating with cross-functional teams to restore service and prevent business impact within strict SLAs.",
+                        "Managed the full lifecycle of change requests, including review, planning, implementation, and verification of OS tuning, software installations, filesystem management, security vulnerability fixes, and CPU/memory upgrades.",
+                        "Successfully migrated virtual servers within VMware infrastructure, ensuring seamless transitions and minimal downtime.",
+                        "Developed and deployed multiple Bash and Python monitoring scripts integrated with RabbitMQ to send alerts to Interlink API and automatically create tickets in ServiceNow, enhancing proactive issue detection.",
+                        "Engineered and deployed self-service and automation websites using Docker containers, Apache, and Django (Python/JBoss), including Unix server health check and CMDB status/history, automated ticket generation and operational dashboards, and a self-service request portal for LVM filesystem and NAS mount management."
+                    ]
+                },
+                {
+                    role: "L3 Unix System Administrator",
+                    company: "DXC Technologies",
+                    period: "November 2016 – March 2018",
+                    details: [
+                        "Proactively managed patch and security updates across the environment, ensuring servers were secured against new vulnerabilities and adhered to policy compliance.",
+                        "Participated in and led customer projects focused on technology transformation and continuous improvement, encompassing configuration management, capacity review, and automation initiatives.",
+                        "Performed proactive and reactive problem management, conducting root cause analysis to prevent recurring infrastructure issues.",
+                        "Independently reviewed, implemented, and verified complex changes, including planning and presenting to Change Advisory Boards for approval."
+                    ]
+                },
+                {
+                    role: "Sr Systems and Network Admin",
+                    company: "FireEye Singapore PTE. LTD",
+                    period: "June 2015 – June 2016",
+                    details: [
+                        "Monitored Linux servers, responded to health check alerts, and performed initial triage and diagnostics for internal FireEye systems, security analyst tools, and backend infrastructure.",
+                        "Provided comprehensive support for network and Linux-based technologies in customer environments, including setup, management, and troubleshooting of network connectivity for security devices.",
+                        "Provisioned, deployed, and configured network and endpoint appliances crucial for cybersecurity monitoring.",
+                        "Developed and updated Standard Operating Procedures (SOPs), including documentation for device administration and troubleshooting."
+                    ]
+                },
+                {
+                    role: "Unix System Administrator for UBS AG, Singapore",
+                    company: "Cognizant Technology Solutions / Softenger Singapore",
+                    period: "August 2012 – June 2015",
+                    details: [
+                        "Executed critical break-fix tasks such as hardware replacement, firmware upgrades, and server reboots.",
+                        "Managed backup and restore operations using Symantec NetBackup, including configuring policies, restoring data from snapshots/tape, and troubleshooting failures.",
+                        "Performed NAS Administration (NETAPP), configuring mounts, creating/expanding volumes, and managing permissions.",
+                        "Implemented complex change requests, including physical-to-virtual migrations (VMware vSphere 5), OS upgrades/rebuilds (RHEL 3-5+), and SAN storage configuration (Veritas VxVM, EMC PowerPath)."
+                    ]
+                },
+                {
+                    role: "Systems Engineer for New York Stock Exchange Technologies",
+                    company: "Fixasia Information Technologies Philippines",
+                    period: "October 2010 – August 2012",
+                    details: [
+                        "Led project implementations for server builds in Production and UAT environments using Kickstart (Red Hat) and Jumpstart (Solaris), completing post-installation configurations.",
+                        "Managed network configurations (routes, IP, bonding), LDAP account creation with Kerberos authentication, and Yum package deployments.",
+                        "Performed Solaris disk redundancy and replacement with Veritas Volume Management and Online Disk Suite.",
+                        "Implemented Veritas Clustering and Server Replication for high availability using SIP and Rsync.",
+                        "Scheduled and automated jobs using cron and scripting (Bash, Perl)."
+                    ]
+                },
+                {
+                    role: "Associate Support Engineer for Hewlett Packard Asia Pacific Ltd",
+                    company: "Emerio Corp. Philippines",
+                    period: "September 2009 – September 2010",
+                    details: [
+                        "Provided first to second-level escalation and support for the Unix team.",
+                        "Resolved, monitored, and managed OS-related incidents (disk, CPU, memory usage, system/application health checks).",
+                        "Managed file systems (ownership, permissions, housekeeping) and disk management (partitioning, formatting, mounting).",
+                        "Performed hardware troubleshooting and break-fix, including log analysis and diagnostics.",
+                        "Managed printing utilities (enabling/disabling/adding printer queues)."
+                    ]
+                }
+            ],
+            skills: {
+                "Operating Systems": ["RHEL 5–9", "CentOS 5–9", "Solaris 8/10", "HP-UX", "AIX 6/7", "FreeBSD 8", "Debian 7", "Windows Server 2003/2008"],
+                "Hardware & Virtualization": ["VMware vCenter 5.5", "6.0–8.0", "SunFire 280R/240V", "HP ProLiant DL", "HP C7000 BladeSystem", "Cisco UCS 1.4", "Docker"],
+                "Cloud Platforms": ["Amazon Web Services (AWS)", "Microsoft Azure"],
+                "Storage & Backup": ["NAS", "SAN", "NetBackup", "Commvault", "TSM", "LVM", "VXVM", "Oracle ASM", "EMC PowerPath"],
+                "Network Services": ["NFS", "DNS", "DHCP", "LDAP", "NIS", "FTP", "Infoblox"],
+                "Clustering & HA": ["Veritas Cluster Server (VCS)", "Red Hat Cluster Suite"],
+                "Monitoring & Administration": ["ITRS Geneos", "HP OpenView", "Nagios", "Zenoss", "Splunk", "Grafana", "FreeIPA", "Quest QAS", "Interlink"],
+                "Automation & Configuration": ["Puppet", "Chef", "Ansible", "GitHub", "Redeye", "CFG Master", "HP Server Automation (HPSA)"],
+                "Applications & Middleware": ["Django", "Apache", "RabbitMQ", "JBoss"],
+                "ITSM / Ticketing Tools": ["ServiceNow", "Salesforce", "HP Service Center", "BMC Remedy (Action Remedy)"],
+                "Scripting & Programming": ["Bash", "Python", "PowerShell"],
+                "Documentation & Collaboration": ["JIRA", "Confluence", "Wiki", "SharePoint"]
+            },
+            projects: [
+                {
+                    title: "Automated Monitoring & Alerting",
+                    description: "Developed and deployed multiple Bash and Python monitoring scripts integrated with RabbitMQ to send alerts to the Interlink API and automatically create tickets in ServiceNow, enhancing proactive issue detection.",
+                    tech: ["Bash", "Python", "RabbitMQ", "ServiceNow API", "Chef", "Ansible"]
+                },
+                {
+                    title: "Self-Service Web Portal",
+                    description: "Engineered a self-service website for managing Unix server LVM filesystems and NAS mounts, empowering users and reducing manual ticket handling.",
+                    tech: ["Docker", "Apache", "Django", "Python", "JBoss"]
+                },
+                {
+                    title: "Operations & CMDB Dashboard",
+                    description: "Created a comprehensive dashboard for Unix server health checks, CMDB status/history, and automated ticket generation, providing a single pane of glass for operations.",
+                    tech: ["Docker", "Python", "Django", "JBoss APIs"]
+                }
+            ],
+            certifications: [
+                { name: "Microsoft Azure Fundamentals (AZ-900)", date: "May 2, 2024" },
+                { name: "Linux Professional Institute LPIC-101", date: "May 22, 2010" }
+            ],
+            training: [
+                { name: "Microsoft Azure Fundamentals AZ-900", period: "Feb 1, 2024 – Mar 30, 2024" },
+                { name: "Systems Operations on AWS", period: "March 1, 2017 – March 3, 2017" },
+                { name: "AWS Tech Essentials", period: "February 20, 2017 – Feb 24, 2017" },
+                { name: "RH254 - Red Hat Linux System Administration III at IT Group, Inc. Philippines", period: "March 19, 2012 – March 12, 2012" },
+                { name: "Linux Training on RH033 – Red Hat Linux Essentials and RH133 – Red Hat System Administration at Touch Solutions Inc.", period: "July 13, 2009 – Aug 25, 2009" }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const timelineNav = document.getElementById('timeline-nav').querySelector('.relative');
+            const experienceDetails = document.getElementById('experience-details');
+            const skillCategoriesContainer = document.getElementById('skill-categories');
+            const skillDisplay = document.getElementById('skill-display');
+            const projectsGrid = document.getElementById('projects-grid');
+            const certificationsList = document.getElementById('certifications-list');
+            const trainingListElement = document.getElementById('training-list'); // Corrected ID
+
+            function populateTimeline() {
+                resumeData.experience.forEach((job, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'timeline-item relative mb-6 cursor-pointer';
+                    item.innerHTML = `
+                        <div class="pl-8">
+                            <h4 class="font-bold text-slate-800">${job.role}</h4>
+                            <p class="text-sm text-slate-600">${job.company}</p>
+                            <p class="text-xs text-slate-500">${job.period}</p>
+                        </div>
+                    `;
+                    item.addEventListener('click', () => {
+                        displayExperience(index);
+                        document.querySelectorAll('.timeline-item').forEach(el => el.classList.remove('active-timeline'));
+                        item.classList.add('active-timeline');
+                        document.querySelectorAll('.timeline-item h4').forEach(h => h.classList.remove('text-blue-600'));
+                        item.querySelector('h4').classList.add('text-blue-600');
+                    });
+                    timelineNav.appendChild(item);
+                });
+            }
+
+            function displayExperience(index) {
+                const job = resumeData.experience[index];
+                experienceDetails.innerHTML = `
+                    <h3 class="text-xl font-bold text-slate-800">${job.role}</h3>
+                    <p class="text-md font-semibold text-blue-600 mb-1">${job.company}</p>
+                    <p class="text-sm text-slate-500 mb-4">${job.period}</p>
+                    <ul class="space-y-2 list-disc list-inside text-slate-600">
+                        ${job.details.map(detail => `<li>${detail}</li>`).join('')}
+                    </ul>
+                `;
+            }
+
+            function populateSkills() {
+                Object.keys(resumeData.skills).forEach(category => {
+                    const button = document.createElement('button');
+                    button.className = 'px-4 py-2 text-sm font-medium border rounded-full hover:bg-blue-50 hover:border-blue-500 transition-colors';
+                    button.textContent = category;
+                    button.addEventListener('click', () => {
+                        displaySkills(category);
+                        document.querySelectorAll('#skill-categories button').forEach(btn => btn.classList.remove('active-tab', 'bg-blue-100'));
+                        button.classList.add('active-tab', 'bg-blue-100');
+                    });
+                    skillCategoriesContainer.appendChild(button);
+                });
+            }
+
+            function displaySkills(category) {
+                const skills = resumeData.skills[category];
+                skillDisplay.innerHTML = `
+                    <div class="flex flex-wrap justify-center gap-x-4 gap-y-2">
+                        ${skills.map(skill => `<span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-sm">${skill}</span>`).join('')}
+                    </div>
+                `;
+            }
+
+            function populateProjects() {
+                resumeData.projects.forEach(project => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white p-6 rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all';
+                    card.innerHTML = `
+                        <h4 class="font-bold text-lg text-slate-800 mb-2">${project.title}</h4>
+                        <p class="text-sm text-slate-600 mb-4">${project.description}</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${project.tech.map(t => `<span class="text-xs bg-blue-50 text-blue-700 font-medium px-2 py-1 rounded-full">${t}</span>`).join('')}
+                        </div>
+                    `;
+                    projectsGrid.appendChild(card);
+                });
+            }
+            
+            function populateCerts() {
+                resumeData.certifications.forEach(cert => {
+                    const item = document.createElement('li');
+                    item.innerHTML = `<strong>${cert.name}</strong> (${cert.date})`;
+                    certificationsList.appendChild(item);
+                });
+            }
+
+            function populateTraining() {
+                resumeData.training.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${item.name}</strong> (${item.period})`;
+                    trainingListElement.appendChild(li);
+                });
+            }
+
+            populateTimeline();
+            populateSkills();
+            populateProjects();
+            populateCerts();
+            populateTraining();
+            displayExperience(0);
+            document.querySelector('.timeline-item').classList.add('active-timeline');
+            document.querySelector('.timeline-item h4').classList.add('text-blue-600');
+        });
+    </script>
+</body>
+</html>
